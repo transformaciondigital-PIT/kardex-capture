@@ -1,4 +1,4 @@
-import { CatalogItem, MovementClass } from "./types";
+import type { CatalogItem, MovementClass } from "./types";
 
 /** Catálogo de materiales (mock). Sustituye con tu API cuando conectes. */
 export const MATERIALS: CatalogItem[] = [
