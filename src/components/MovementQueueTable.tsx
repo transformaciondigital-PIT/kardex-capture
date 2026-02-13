@@ -1,5 +1,4 @@
-import React from "react";
-import { MovementDraft } from "../types";
+import type { MovementDraft } from "../types";
 
 type Props = {
   queue: MovementDraft[];
@@ -35,6 +34,7 @@ export default function MovementQueueTable({ queue, onEdit, onDuplicate, onDelet
                 <th>Estado</th>
                 <th>Fecha</th>
                 <th>Clase</th>
+                <th>Descripción</th>
                 <th>Grupo</th>
                 <th>Material</th>
                 <th>Centro</th>
@@ -62,6 +62,7 @@ export default function MovementQueueTable({ queue, onEdit, onDuplicate, onDelet
                   </td>
                   <td>{m.fechaConta || "-"}</td>
                   <td>{m.claseMov ? `${m.claseMov}` : "-"}</td>
+                  <td>{m.claseMovDesc || "-"}</td>
                   <td>{m.grupoKardex}</td>
                   <td title={m.matDesc}>{m.material || "-"}</td>
                   <td>{m.centro || "-"}</td>

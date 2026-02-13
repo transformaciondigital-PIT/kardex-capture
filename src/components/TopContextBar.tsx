@@ -1,6 +1,5 @@
-import React from "react";
 import { ALMACENES, CENTROS, MATERIALS, MONEDAS } from "../catalogs";
-import { ContextState } from "../types";
+import type { ContextState } from "../types";
 
 type Props = {
   context: ContextState;

@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { MovementDraft } from "../types";
+import { useMemo } from "react";
+import type { MovementDraft } from "../types";
 
 type Props = {
   queue: MovementDraft[];
