@@ -14,11 +14,16 @@ function badgeClass(status: string) {
 }
 
 export default function MovementQueueTable({ queue, onEdit, onDuplicate, onDelete }: Props) {
+  const readyCount = queue.filter((m) => m.status === "ready").length;
+  const errorCount = queue.filter((m) => m.status === "error").length;
+
   return (
     <div className="panel">
       <div className="panel-header">
         <div className="panel-title">Bandeja de movimientos</div>
-        <div className="panel-subtitle">{queue.length} registro(s)</div>
+        <div className="panel-subtitle">
+          {queue.length} registro(s) · {readyCount} listos · {errorCount} con error
+        </div>
       </div>
 
       {queue.length === 0 ? (
@@ -74,9 +79,15 @@ export default function MovementQueueTable({ queue, onEdit, onDuplicate, onDelet
                   <td>{m.moneda || "-"}</td>
                   <td>{m.noDocumentoMat || "-"}</td>
                   <td className="actions">
-                    <button className="btn btn-mini" onClick={() => onEdit(m.id)}>Editar</button>
-                    <button className="btn btn-mini" onClick={() => onDuplicate(m.id)}>Duplicar</button>
-                    <button className="btn btn-mini btn-danger" onClick={() => onDelete(m.id)}>Eliminar</button>
+                    <button className="btn btn-mini" onClick={() => onEdit(m.id)}>
+                      Editar
+                    </button>
+                    <button className="btn btn-mini" onClick={() => onDuplicate(m.id)}>
+                      Duplicar
+                    </button>
+                    <button className="btn btn-mini btn-danger" onClick={() => onDelete(m.id)}>
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}
