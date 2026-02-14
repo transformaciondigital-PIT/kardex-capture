@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { ALMACENES, CENTROS, MOVEMENT_CLASSES } from "../catalogs";
-import { ContextState, MovementDraft } from "../types";
+import type { ContextState, MovementDraft } from "../types";
 import { clampNumberString, findClass, validateMovement, computeStatus, createEmptyDraft } from "../utils";
 
 type Props = {
@@ -272,6 +272,7 @@ export default function MovementForm({
               onChange={(e) => patch({ fechaFab: e.target.value })}
               disabled={!canWork}
             />
+            {draft.errors.fechaFab && <div className="error">{draft.errors.fechaFab}</div>}
           </div>
 
           <div className="field field-span-2">

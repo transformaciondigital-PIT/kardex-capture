@@ -1,6 +1,5 @@
-import React from "react";
 import { ALMACENES, CENTROS, MATERIALS, MONEDAS } from "../catalogs";
-import { ContextState } from "../types";
+import type { ContextState } from "../types";
 
 type Props = {
   context: ContextState;
@@ -10,37 +9,41 @@ type Props = {
 
 export default function TopContextBar({ context, onChange, onClearQueue }: Props) {
   const selectedMat = MATERIALS.find((m) => m.code === context.material);
+  const isContextReady = Boolean(context.centro && context.almacen && context.material);
 
   return (
     <div className="topbar">
       <div className="topbar-left">
-        <div className="title">Kardex — Captura de Movimientos</div>
-        <div className="subtitle">En espera de ingresar datos</div>
+        <div className="title-row">
+          <div className="title">Kardex — Captura de Movimientos</div>
+          <span className={`context-badge ${isContextReady ? "ok" : "warn"}`}>
+            {isContextReady ? "Contexto listo" : "Contexto incompleto"}
+          </span>
+        </div>
+        <div className="subtitle">Fase 1 · En espera de ingresar datos</div>
       </div>
 
       <div className="topbar-controls">
         <div className="field">
           <label>Centro</label>
-          <select
-            value={context.centro}
-            onChange={(e) => onChange({ centro: e.target.value })}
-          >
+          <select value={context.centro} onChange={(e) => onChange({ centro: e.target.value })}>
             <option value="">Seleccionar...</option>
             {CENTROS.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         </div>
 
         <div className="field">
           <label>Almacén</label>
-          <select
-            value={context.almacen}
-            onChange={(e) => onChange({ almacen: e.target.value })}
-          >
+          <select value={context.almacen} onChange={(e) => onChange({ almacen: e.target.value })}>
             <option value="">Seleccionar...</option>
             {ALMACENES.map((a) => (
-              <option key={a} value={a}>{a}</option>
+              <option key={a} value={a}>
+                {a}
+              </option>
             ))}
           </select>
         </div>
@@ -75,12 +78,11 @@ export default function TopContextBar({ context, onChange, onClearQueue }: Props
 
         <div className="field">
           <label>Moneda</label>
-          <select
-            value={context.monedaDefault}
-            onChange={(e) => onChange({ monedaDefault: e.target.value })}
-          >
+          <select value={context.monedaDefault} onChange={(e) => onChange({ monedaDefault: e.target.value })}>
             {MONEDAS.map((m) => (
-              <option key={m} value={m}>{m}</option>
+              <option key={m} value={m}>
+                {m}
+              </option>
             ))}
           </select>
         </div>

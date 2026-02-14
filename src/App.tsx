@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from "react";
+import { useState } from "react";
 import TopContextBar from "./components/TopContextBar";
 import MovementForm from "./components/MovementForm";
 import MovementQueueTable from "./components/MovementQueueTable";
 import CaptureSummary from "./components/CaptureSummary";
 import { useLocalStorageState } from "./hooks/useLocalStorageState";
-import { ContextState, MovementDraft } from "./types";
+import type { ContextState, MovementDraft } from "./types";
 import { createEmptyDraft, uid, validateMovement, computeStatus } from "./utils";
 
 const LS_CONTEXT = "kardex_context_v1";
@@ -21,10 +21,11 @@ export default function App() {
   });
 
   const [queue, setQueue] = useLocalStorageState<MovementDraft[]>(LS_QUEUE, []);
-  const [draft, setDraft] = useState<MovementDraft>(() => {
-    const d = createEmptyDraft();
+
+  const createDraftFromContext = (): MovementDraft => {
+    const empty = createEmptyDraft();
     return {
-      ...d,
+      ...empty,
       material: context.material,
       matDesc: context.matDesc,
       centro: context.centro,
@@ -32,6 +33,10 @@ export default function App() {
       um: context.um,
       moneda: context.monedaDefault,
     };
+  };
+
+  const [draft, setDraft] = useState<MovementDraft>(() => {
+    return createDraftFromContext();
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -53,11 +58,11 @@ export default function App() {
   };
 
   const addToQueue = (m: MovementDraft) => {
-    setQueue([m, ...queue]);
+    setQueue((prev) => [m, ...prev]);
   };
 
   const updateQueue = (m: MovementDraft) => {
-    setQueue(queue.map((x) => (x.id === m.id ? m : x)));
+    setQueue((prev) => prev.map((x) => (x.id === m.id ? m : x)));
     setEditingId(null);
   };
 
@@ -71,16 +76,7 @@ export default function App() {
   const onCancelEdit = () => {
     setEditingId(null);
     // reset draft pero conserva contexto
-    const next = createEmptyDraft();
-    setDraft({
-      ...next,
-      material: context.material,
-      matDesc: context.matDesc,
-      centro: context.centro,
-      almacen: context.almacen,
-      um: context.um,
-      moneda: context.monedaDefault,
-    });
+    setDraft(createDraftFromContext());
   };
 
   const onDuplicate = (id: string) => {
@@ -93,11 +89,11 @@ export default function App() {
       status: "draft",
       errors: {},
     };
-    setQueue([copy, ...queue]);
+    setQueue((prev) => [copy, ...prev]);
   };
 
   const onDelete = (id: string) => {
-    setQueue(queue.filter((q) => q.id !== id));
+    setQueue((prev) => prev.filter((q) => q.id !== id));
     if (editingId === id) onCancelEdit();
   };
 

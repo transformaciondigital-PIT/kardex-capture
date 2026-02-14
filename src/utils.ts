@@ -1,4 +1,4 @@
-import { MovementClass, MovementDraft } from "./types";
+import type { MovementClass, MovementDraft } from "./types";
 import { MOVEMENT_CLASSES } from "./catalogs";
 
 export const uid = () => crypto.randomUUID();
@@ -19,7 +19,7 @@ export function findClass(code: number | null): MovementClass | null {
 export function clampNumberString(s: string, allowNegative = false) {
   // Permite decimales con punto. (Puedes adaptar a coma si deseas)
   const cleaned = s
-    .replace(/[^\d\.\-]/g, "")
+    .replace(/[^\d.-]/g, "")
     .replace(/(?!^)-/g, "") // solo un '-' al inicio
     .replace(/(\..*)\./g, "$1"); // solo un punto
 
@@ -44,6 +44,7 @@ export function validateMovement(m: MovementDraft) {
   if (!m.cantidad) errors.cantidad = "Ingresa cantidad.";
   else if (Number.isNaN(qty)) errors.cantidad = "Cantidad inválida.";
   else if (qty === 0) errors.cantidad = "Cantidad no puede ser 0.";
+  else if (qty < 0) errors.cantidad = "Cantidad debe ser positiva.";
 
   // Traslado destino
   const cls = findClass(m.claseMov);
@@ -70,6 +71,11 @@ export function validateMovement(m: MovementDraft) {
   if (m.valor) {
     const v = Number(m.valor);
     if (Number.isNaN(v)) errors.valor = "Valor inválido.";
+    else if (v < 0) errors.valor = "Valor debe ser positivo.";
+  }
+
+  if (m.fechaFab && m.fechaConta && m.fechaFab > m.fechaConta) {
+    errors.fechaFab = "Fecha fabricación no puede ser posterior a fecha contable.";
   }
 
   return errors;
