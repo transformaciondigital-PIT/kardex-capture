@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { MovementDraft } from "../types";
+import { useMemo } from "react";
+import type { MovementDraft } from "../types";
 
 type Props = {
   queue: MovementDraft[];
@@ -40,15 +40,17 @@ export default function CaptureSummary({ queue, onSubmit }: Props) {
         <div className="card-v">{totalVal.toFixed(2)}</div>
       </div>
 
-      <button className="btn btn-primary" onClick={onSubmit} disabled={!canSubmit}>
-        Registrar (mock)
-      </button>
+      <div className="summary-actions">
+        <button className="btn btn-primary" onClick={onSubmit} disabled={!canSubmit}>
+          Registrar (mock)
+        </button>
 
-      {!canSubmit && count > 0 && (
-        <div className="summary-hint">
-          Corrige los registros con estado <b>error</b> antes de registrar.
-        </div>
-      )}
+        {!canSubmit && count > 0 && (
+          <div className="summary-hint">
+            Corrige los registros con estado <b>error</b> antes de registrar.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
