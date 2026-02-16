@@ -1,0 +1,2 @@
+noDocumentoMat,anio,claseMov,claseMovDesc,grupoKardex,fechaConta,noPedido,material,matDesc,centro,almacen,lote,cantidad,um,valor,moneda,sgtxt,lifnr,proveedorDesc,fechaFab,sociedad,debHabOriginal,centroDestino,almacenDestino,tipoFlujo
+4900000001,2024,101,Compras,Entrada,2024-10-01,4500001234,1004D,Queso Domino's,0014,0001,LT1001,120.5,LB,2450.75,GTQ,Ingreso inicial,0000123456,Proveedor Demo,2024-09-25,1000,H,, ,INGRESO_BODEGA
