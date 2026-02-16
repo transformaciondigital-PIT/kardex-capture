@@ -24,7 +24,6 @@ export default function App() {
 
   const [queue, setQueue] = useLocalStorageState<MovementDraft[]>(LS_QUEUE, []);
   const [importMessage, setImportMessage] = useState("");
-  const [isImporting, setIsImporting] = useState(false);
 
   const createDraftFromContext = (): MovementDraft => {
     const empty = createEmptyDraft();
@@ -151,49 +150,6 @@ export default function App() {
     setImportMessage("Bandeja limpiada.");
   };
 
-  const onImportCsv = async (file: File, mode: "append" | "replace") => {
-    setIsImporting(true);
-
-    try {
-      const text = await file.text();
-      const parsed = parseKardexCsv(text, context);
-
-      if (parsed.errors.length > 0 && parsed.imported === 0) {
-        setImportMessage(`Error de CSV: ${parsed.errors[0]}`);
-        return;
-      }
-
-      setQueue((prev) => {
-        const merged = mode === "replace" ? parsed.movements : [...parsed.movements, ...prev];
-        const deduped: MovementDraft[] = [];
-        const seen = new Set<string>();
-
-        for (const m of merged) {
-          const key = movementUniqueKey(m);
-          if (seen.has(key)) continue;
-          seen.add(key);
-          deduped.push(m);
-        }
-
-        return deduped;
-      });
-
-      if (mode === "replace") {
-        setEditingId(null);
-        setDraft(createDraftFromContext());
-      }
-
-      const issues = parsed.errors.length > 0 ? ` Avisos: ${parsed.errors[0]}` : "";
-      setImportMessage(
-        `CSV procesado: ${parsed.imported} fila(s) importadas, ${parsed.skipped} omitidas.${issues}`,
-      );
-    } catch {
-      setImportMessage("No se pudo leer el archivo CSV. Verifica formato y codificación UTF-8.");
-    } finally {
-      setIsImporting(false);
-    }
-  };
-
   const onSubmit = () => {
     const validated = queue.map((m) => {
       const errors = validateMovement(m);
@@ -214,9 +170,7 @@ export default function App() {
         context={context}
         onChange={onContextChange}
         onClearQueue={onClearQueue}
-        onImportCsv={onImportCsv}
         importMessage={importMessage}
-        isImporting={isImporting}
       />
 
       <div className="content">

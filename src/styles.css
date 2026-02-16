@@ -222,19 +222,6 @@ textarea {
   resize: vertical;
 }
 
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #8cb0ff;
-  box-shadow: 0 0 0 3px rgba(35, 87, 214, 0.12);
-}
-
-textarea {
-  resize: vertical;
-}
-
 .error {
   color: var(--danger);
   font-size: 12px;
