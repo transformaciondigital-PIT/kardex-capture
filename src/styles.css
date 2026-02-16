@@ -192,6 +192,13 @@ body {
   font-weight: 600;
 }
 
+
+.field label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 input,
 select,
 textarea {
@@ -202,6 +209,19 @@ textarea {
   padding: 10px 10px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #8cb0ff;
+  box-shadow: 0 0 0 3px rgba(35, 87, 214, 0.12);
+}
+
+textarea {
+  resize: vertical;
+}
+
 }
 
 input:focus,

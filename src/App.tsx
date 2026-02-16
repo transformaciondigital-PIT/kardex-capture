@@ -77,6 +77,7 @@ export default function App() {
 
   const onCancelEdit = () => {
     setEditingId(null);
+    // reset draft pero conserva contexto
     setDraft(createDraftFromContext());
   };
 

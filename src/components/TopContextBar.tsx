@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { ALMACENES, CENTROS, MATERIALS, MONEDAS } from "../catalogs";
 import type { CsvImportMode } from "../csvImport";
+import { ALMACENES, CENTROS, MATERIALS, MONEDAS } from "../catalogs";
 import type { ContextState } from "../types";
 
 type Props = {
