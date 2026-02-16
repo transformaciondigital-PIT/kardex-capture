@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TopContextBar from "./components/TopContextBar";
 import MovementForm from "./components/MovementForm";
 import MovementQueueTable from "./components/MovementQueueTable";
@@ -10,6 +10,7 @@ import { createEmptyDraft, uid, validateMovement, computeStatus } from "./utils"
 
 const LS_CONTEXT = "kardex_context_v1";
 const LS_QUEUE = "kardex_queue_v1";
+const DEFAULT_CSV_PATH = "/data/mb51.csv";
 
 export default function App() {
   const [context, setContext] = useLocalStorageState<ContextState>(LS_CONTEXT, {
@@ -43,6 +44,7 @@ export default function App() {
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const initialContextRef = useRef(context);
 
   const onContextChange = (patch: Partial<ContextState>) => {
     const next = { ...context, ...patch };
@@ -58,6 +60,50 @@ export default function App() {
       moneda: next.monedaDefault,
     }));
   };
+
+  useEffect(() => {
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(DEFAULT_CSV_PATH, { cache: "no-store" });
+        if (!response.ok) {
+          setImportMessage(`No se encontró ${DEFAULT_CSV_PATH}. Guarda ahí tu archivo CSV.`);
+          return;
+        }
+
+        const text = await response.text();
+        const parsed = parseKardexCsv(text, initialContextRef.current);
+
+        if (parsed.errors.length > 0 && parsed.imported === 0) {
+          setImportMessage(`Error de CSV (${DEFAULT_CSV_PATH}): ${parsed.errors[0]}`);
+          return;
+        }
+
+        setQueue((prev) => {
+          const merged = [...parsed.movements, ...prev];
+          const deduped: MovementDraft[] = [];
+          const seen = new Set<string>();
+
+          for (const m of merged) {
+            const key = movementUniqueKey(m);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            deduped.push(m);
+          }
+
+          return deduped;
+        });
+
+        const issues = parsed.errors.length > 0 ? ` Avisos: ${parsed.errors[0]}` : "";
+        setImportMessage(
+          `Cargado ${DEFAULT_CSV_PATH}: ${parsed.imported} fila(s), ${parsed.skipped} omitidas.${issues}`,
+        );
+      } catch {
+        setImportMessage(`Error leyendo ${DEFAULT_CSV_PATH}. Verifica codificación UTF-8.`);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [setQueue]);
 
   const addToQueue = (m: MovementDraft) => {
     setQueue((prev) => [m, ...prev]);
