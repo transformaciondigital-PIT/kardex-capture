@@ -3,6 +3,7 @@ import TopContextBar from "./components/TopContextBar";
 import MovementForm from "./components/MovementForm";
 import MovementQueueTable from "./components/MovementQueueTable";
 import CaptureSummary from "./components/CaptureSummary";
+import { parseKardexCsv, movementUniqueKey } from "./csvImport";
 import { useLocalStorageState } from "./hooks/useLocalStorageState";
 import type { ContextState, MovementDraft } from "./types";
 import { createEmptyDraft, uid, validateMovement, computeStatus } from "./utils";
@@ -21,6 +22,8 @@ export default function App() {
   });
 
   const [queue, setQueue] = useLocalStorageState<MovementDraft[]>(LS_QUEUE, []);
+  const [importMessage, setImportMessage] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
 
   const createDraftFromContext = (): MovementDraft => {
     const empty = createEmptyDraft();
@@ -45,7 +48,6 @@ export default function App() {
     const next = { ...context, ...patch };
     setContext(next);
 
-    // si se cambia material/centro/almacen, sincroniza en draft (sin pisar campos de movimiento)
     setDraft((d) => ({
       ...d,
       material: next.material,
@@ -100,10 +102,53 @@ export default function App() {
   const onClearQueue = () => {
     setQueue([]);
     onCancelEdit();
+    setImportMessage("Bandeja limpiada.");
+  };
+
+  const onImportCsv = async (file: File, mode: "append" | "replace") => {
+    setIsImporting(true);
+
+    try {
+      const text = await file.text();
+      const parsed = parseKardexCsv(text, context);
+
+      if (parsed.errors.length > 0 && parsed.imported === 0) {
+        setImportMessage(`Error de CSV: ${parsed.errors[0]}`);
+        return;
+      }
+
+      setQueue((prev) => {
+        const merged = mode === "replace" ? parsed.movements : [...parsed.movements, ...prev];
+        const deduped: MovementDraft[] = [];
+        const seen = new Set<string>();
+
+        for (const m of merged) {
+          const key = movementUniqueKey(m);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          deduped.push(m);
+        }
+
+        return deduped;
+      });
+
+      if (mode === "replace") {
+        setEditingId(null);
+        setDraft(createDraftFromContext());
+      }
+
+      const issues = parsed.errors.length > 0 ? ` Avisos: ${parsed.errors[0]}` : "";
+      setImportMessage(
+        `CSV procesado: ${parsed.imported} fila(s) importadas, ${parsed.skipped} omitidas.${issues}`,
+      );
+    } catch {
+      setImportMessage("No se pudo leer el archivo CSV. Verifica formato y codificación UTF-8.");
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   const onSubmit = () => {
-    // Mock: solo valida todo y “registrar”
     const validated = queue.map((m) => {
       const errors = validateMovement(m);
       return { ...m, errors, status: computeStatus(errors) };
@@ -113,18 +158,20 @@ export default function App() {
     const hasErrors = validated.some((m) => m.status === "error");
     if (hasErrors) return;
 
-    // Aquí conectarías tu API: POST /movimientos
     console.log("SUBMIT (mock)", validated);
     alert(`Registrado (mock): ${validated.length} movimiento(s). Revisa consola.`);
-
-    // opcional: limpiar bandeja tras enviar
-    // setQueue([]);
   };
 
-  // Layout
   return (
     <div className="app">
-      <TopContextBar context={context} onChange={onContextChange} onClearQueue={onClearQueue} />
+      <TopContextBar
+        context={context}
+        onChange={onContextChange}
+        onClearQueue={onClearQueue}
+        onImportCsv={onImportCsv}
+        importMessage={importMessage}
+        isImporting={isImporting}
+      />
 
       <div className="content">
         <div className="col-left">
