@@ -91,17 +91,6 @@ body {
 }
 
 
-.data-source-note {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #2f4d7a;
-  background: #eef4ff;
-  border: 1px solid #cdddf9;
-  border-radius: 8px;
-  padding: 6px 8px;
-  max-width: 460px;
-}
-
 .import-message {
   margin-top: 8px;
   font-size: 12px;
@@ -113,6 +102,16 @@ body {
   max-width: 460px;
 }
 
+.import-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-self: end;
+}
+
+.hidden-input {
+  display: none;
+}
 
 .topbar-controls {
   display: grid;
@@ -193,6 +192,13 @@ body {
   font-weight: 600;
 }
 
+
+.field label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 input,
 select,
 textarea {
@@ -203,6 +209,19 @@ textarea {
   padding: 10px 10px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #8cb0ff;
+  box-shadow: 0 0 0 3px rgba(35, 87, 214, 0.12);
+}
+
+textarea {
+  resize: vertical;
+}
+
 }
 
 input:focus,
@@ -457,6 +476,10 @@ textarea {
     grid-template-columns: repeat(2, minmax(140px, 1fr));
   }
 
+  .import-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -469,4 +492,7 @@ textarea {
     align-items: flex-start;
   }
 
+  .import-actions {
+    grid-template-columns: 1fr;
+  }
 }
